@@ -1,17 +1,22 @@
-import { useState } from 'preact/hooks'
-import './app.css'
+import "./app.css";
+
+import { COLS, init, ROWS } from "./game.ts";
+
+const map = init();
 
 export function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
+      <style>
+        {`:root {
+            --map-rows: ${ROWS};
+            --map-cols: ${COLS};
+        }`}
+      </style>
+
       <h1>First ASCII Roguelike</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
+
+      <div class="grid">{map.map((r) => r.map((c) => <div>{c}</div>))}</div>
     </>
-  )
+  );
 }

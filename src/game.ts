@@ -2,6 +2,12 @@
 export const ROWS = 15;
 export const COLS = 15;
 
+export enum GameState {
+  PLAYING,
+  VICTORY,
+  GAME_OVER,
+}
+
 // number of actors per level, including player
 const ACTORS = 10;
 
@@ -13,11 +19,14 @@ const asciiDisplay: Cell[][] = [];
 
 // a list of all actors, 0 is the player
 let player: Actor;
-let enemyList: Actor[];
+const enemyList: Actor[] = [];
 let livingEnemies: number;
 
 // points to each actor in its position, for quick searching
-let actorMap: Record<string, Actor | null>;
+const actorMap: Record<string, Actor | null> = {};
+
+// the state of the game
+let state: GameState = GameState.PLAYING;
 
 export function create() {
   // initialize map
@@ -37,7 +46,7 @@ export function create() {
   drawMap();
   drawActors();
 
-  return asciiDisplay;
+  return { map: asciiDisplay, state };
 }
 
 function initMap() {
@@ -63,21 +72,19 @@ function randomInt(max: number) {
 
 function initActors() {
   // create actors at random locations
-  enemyList = [];
-  actorMap = {};
   for (let e = 0; e < ACTORS; e++) {
     // create new actor
     const actor: Actor = {
       x: 0,
       y: 0,
-      hp: e == ACTORS - 1 ? 3 : 1, // player has 3 health, enemies only 1
+      hp: e === ACTORS - 1 ? 3 : 1, // player has 3 health, enemies only 1
     };
     do {
       // pick a random position that is both a floor and not occupied
       actor.y = randomInt(ROWS);
       actor.x = randomInt(COLS);
     } while (
-      map[actor.y][actor.x] == "#" ||
+      map[actor.y][actor.x] === "#" ||
       actorMap[actor.y + "_" + actor.x] != null
     );
 
@@ -108,7 +115,7 @@ function canGo(actor: Actor, dir: Direction) {
     actor.x + dir.x <= COLS - 1 &&
     actor.y + dir.y >= 0 &&
     actor.y + dir.y <= ROWS - 1 &&
-    map[actor.y + dir.y][actor.x + dir.x] == "."
+    map[actor.y + dir.y][actor.x + dir.x] === "."
   );
 }
 
@@ -121,27 +128,17 @@ function moveTo(actor: Actor, dir: Direction) {
   // if the destination tile has an actor in it
   const victim = actorMap[newKey];
   if (victim) {
-    //decrement hitpoints of the actor at the destination tile
+    //decrement hit points of the actor at the destination tile
     victim.hp--;
 
     // if it's dead remove its reference
-    if (victim.hp == 0) {
+    if (victim.hp === 0) {
       actorMap[newKey] = null;
-      enemyList.splice(enemyList.indexOf(victim));
+      enemyList.splice(enemyList.indexOf(victim), 1);
       if (victim != player) {
         livingEnemies--;
-        if (livingEnemies == 0) {
-          // victory message
-          // const victory = game.add.text(
-          //   game.world.centerX,
-          //   game.world.centerY,
-          //   "Victory!\nCtrl+r to restart",
-          //   {
-          //     fill: "#2e2",
-          //     align: "center",
-          //   },
-          // );
-          // victory.anchor.setTo(0.5, 0.5);
+        if (livingEnemies === 0) {
+          state = GameState.VICTORY;
         }
       }
     }
@@ -193,7 +190,7 @@ export function onKeyUp(event: KeyboardEvent) {
   // draw actors in new positions
   drawActors();
 
-  return [...asciiDisplay];
+  return { map: [...asciiDisplay], state };
 }
 
 function aiAct(actor: Actor) {
@@ -234,16 +231,6 @@ function aiAct(actor: Actor) {
     }
   }
   if (player.hp < 1) {
-    // game over message
-    // const gameOver = game.add.text(
-    //   game.world.centerX,
-    //   game.world.centerY,
-    //   "Game Over\nCtrl+r to restart",
-    //   {
-    //     fill: "#e22",
-    //     align: "center",
-    //   },
-    // );
-    // gameOver.anchor.setTo(0.5, 0.5);
+    state = GameState.GAME_OVER;
   }
 }

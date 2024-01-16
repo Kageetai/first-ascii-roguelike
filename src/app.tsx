@@ -2,17 +2,22 @@ import { useState } from "preact/hooks";
 
 import "./app.css";
 
-import { COLS, create, onKeyUp, ROWS } from "./game.ts";
+import { COLS, create, GameState, onKeyUp, ROWS } from "./game.ts";
 
 const initialState = create();
 
 export function App() {
-  const [asciiDisplay, setAsciiDisplay] = useState(initialState);
+  const [game, setGame] = useState(initialState);
 
-  const onKeyUp1 = (e: KeyboardEvent) => {
+  const onKeyUpEvent = (e: KeyboardEvent) => {
     const updatedDisplay = onKeyUp(e);
-    setAsciiDisplay(updatedDisplay);
+    setGame(updatedDisplay);
   };
+
+  if (game.state !== GameState.PLAYING) {
+    const dialog = document.getElementById("dialog") as HTMLDialogElement;
+    dialog.showModal();
+  }
 
   return (
     <>
@@ -29,9 +34,15 @@ export function App() {
         <small>Preact Version</small>
       </p>
 
-      <div class="grid" onKeyUp={onKeyUp1} tabIndex={0}>
-        {asciiDisplay.map((r) => r.map((c) => <div data-cell={c}>{c}</div>))}
+      <div class="grid" onKeyUp={onKeyUpEvent} tabIndex={0}>
+        {game.map.map((r) => r.map((c) => <div data-cell={c}>{c}</div>))}
       </div>
+
+      <dialog id="dialog">
+        <h1>{game.state === GameState.VICTORY ? "Victory" : "Game Over"}</h1>
+
+        <p>Restart with Ctrl/Cmd+R</p>
+      </dialog>
     </>
   );
 }

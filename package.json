@@ -11,7 +11,7 @@
     "lint": "eslint src/*.{ts,tsx}"
   },
   "lint-staged": {
-    "**/*.{ts,tsx}": "eslint src/*.{ts,tsx}",
+    "**/*.{ts,tsx}": "eslint",
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {

@@ -1,10 +1,10 @@
 import "./app.css";
 
-import { COLS, init, ROWS } from "./game.ts";
-
-const map = init();
+import { COLS, init, onKeyUp, ROWS } from "./game.ts";
 
 export function App() {
+  const map = init();
+
   return (
     <>
       <style>
@@ -16,7 +16,13 @@ export function App() {
 
       <h1>First ASCII Roguelike</h1>
 
-      <div class="grid">{map.map((r) => r.map((c) => <div>{c}</div>))}</div>
+      <p>
+        <small>Preact Version</small>
+      </p>
+
+      <div class="grid" onKeyUp={onKeyUp} tabIndex={0}>
+        {map.map((r) => r.map((c) => <div>{c}</div>))}
+      </div>
     </>
   );
 }

@@ -6,10 +6,10 @@ export const COLS = 15;
 const ACTORS = 10;
 
 // the structure of the map
-let map: Cell[][];
+const map: Cell[][] = [];
 
-// the ascii display, as a 2d array of characters
-// let asciiDisplay;
+// the ascii display, combining map and actors
+const asciiDisplay: Cell[][] = [];
 
 // a list of all actors, 0 is the player
 let player: Actor;
@@ -19,48 +19,29 @@ let livingEnemies: number;
 // points to each actor in its position, for quick searching
 let actorMap: Record<string, Actor | null>;
 
-// initialize phaser, call create() once done
-// var game = new Phaser.Game(COLS * FONT * 0.6, ROWS * FONT, Phaser.AUTO, null, {
-//     create: create
-// });
-
-export function init() {
-  // init keyboard commands
-  // game.input.keyboard.addCallbacks(null, null, onKeyUp);
-
+export function create() {
   // initialize map
   initMap();
 
   // initialize ascii display
-  // asciiDisplay = [];
-  // for (let y = 0; y < ROWS; y++) {
-  //   const newRow: Cell[] = [];
-  //   asciiDisplay.push(newRow);
-  //   for (let x = 0; x < COLS; x++) newRow.push("");
-  // }
+  for (let y = 0; y < ROWS; y++) {
+    const newRow: Cell[] = [];
+    asciiDisplay.push(newRow);
+    for (let x = 0; x < COLS; x++) newRow.push("");
+  }
 
   // initialize actors
   initActors();
 
   // draw level
-  // drawMap();
+  drawMap();
   drawActors();
 
-  return map;
+  return asciiDisplay;
 }
-
-// function initCell(chr, x, y) {
-//     // add a single cell in a given position to the ascii display
-//     var style = {
-//         font: FONT + "px monospace",
-//         fill: "#fff"
-//     };
-//     return game.add.text(FONT * 0.6 * x, FONT * y, chr, style);
-// }
 
 function initMap() {
   // create a new random map
-  map = [];
   for (let y = 0; y < ROWS; y++) {
     const newRow: Cell[] = [];
     for (let x = 0; x < COLS; x++) {
@@ -71,11 +52,10 @@ function initMap() {
   }
 }
 
-// function drawMap() {
-//     for (var y = 0; y < ROWS; y++)
-//         for (var x = 0; x < COLS; x++)
-//             asciidisplay[y][x].content = map[y][x];
-// }
+function drawMap() {
+  for (let y = 0; y < ROWS; y++)
+    for (let x = 0; x < COLS; x++) asciiDisplay[y][x] = map[y][x];
+}
 
 function randomInt(max: number) {
   return Math.floor(Math.random() * max);
@@ -113,12 +93,12 @@ function initActors() {
 
 function drawActors() {
   // draw the player
-  map[player.y][player.x] = player.hp;
+  asciiDisplay[player.y][player.x] = player.hp;
 
   // draw the enemies
   for (const a in enemyList) {
     if (enemyList[a] != null && enemyList[a].hp > 0)
-      map[enemyList[a].y][enemyList[a].x] = "e";
+      asciiDisplay[enemyList[a].y][enemyList[a].x] = "e";
   }
 }
 
@@ -181,9 +161,7 @@ function moveTo(actor: Actor, dir: Direction) {
 
 export function onKeyUp(event: KeyboardEvent) {
   // draw map to overwrite previous actors positions
-  // drawMap();
-
-  console.log("onKeyUp", event);
+  drawMap();
 
   // act on player input
   let acted = false;
@@ -214,6 +192,8 @@ export function onKeyUp(event: KeyboardEvent) {
 
   // draw actors in new positions
   drawActors();
+
+  return [...asciiDisplay];
 }
 
 function aiAct(actor: Actor) {

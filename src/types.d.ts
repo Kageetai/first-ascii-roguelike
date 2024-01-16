@@ -1,6 +1,6 @@
 type Health = 3 | 2 | 1 | 0;
 
-type Cell = "." | "#" | "e" | Health;
+type Cell = "" | "." | "#" | "e" | Health;
 
 type Actor = {
   x: number;

@@ -13,7 +13,7 @@ let map: Cell[][];
 
 // a list of all actors, 0 is the player
 let player: Actor;
-let actorList: Actor[];
+let enemyList: Actor[];
 let livingEnemies: number;
 
 // points to each actor in its position, for quick searching
@@ -44,7 +44,7 @@ export function init() {
 
   // draw level
   // drawMap();
-  // drawActors();
+  drawActors();
 
   return map;
 }
@@ -83,14 +83,14 @@ function randomInt(max: number) {
 
 function initActors() {
   // create actors at random locations
-  actorList = [];
+  enemyList = [];
   actorMap = {};
   for (let e = 0; e < ACTORS; e++) {
     // create new actor
-    const actor = {
+    const actor: Actor = {
       x: 0,
       y: 0,
-      hp: e == 0 ? 3 : 1,
+      hp: e == ACTORS - 1 ? 3 : 1, // player has 3 health, enemies only 1
     };
     do {
       // pick a random position that is both a floor and not occupied
@@ -103,22 +103,24 @@ function initActors() {
 
     // add references to the actor to the actors list & map
     actorMap[actor.y + "_" + actor.x] = actor;
-    actorList.push(actor);
+    enemyList.push(actor);
   }
 
-  // the player is the first actor in the list
-  player = actorList[0];
+  // the player is the last actor in the list
+  player = enemyList.pop() as Actor;
   livingEnemies = ACTORS - 1;
-
-  console.log("initActors", actorList);
 }
 
-// function drawActors() {
-//     for (var a in actorList) {
-//         if (actorList[a] != null && actorList[a].hp > 0)
-//             asciidisplay[actorList[a].y][actorList[a].x].content = a == 0 ? '' + player.hp : 'e';
-//     }
-// }
+function drawActors() {
+  // draw the player
+  map[player.y][player.x] = player.hp;
+
+  // draw the enemies
+  for (const a in enemyList) {
+    if (enemyList[a] != null && enemyList[a].hp > 0)
+      map[enemyList[a].y][enemyList[a].x] = "e";
+  }
+}
 
 function canGo(actor: Actor, dir: Direction) {
   return (
@@ -137,15 +139,15 @@ function moveTo(actor: Actor, dir: Direction) {
   // moves actor to the new location
   const newKey = actor.y + dir.y + "_" + (actor.x + dir.x);
   // if the destination tile has an actor in it
-  if (actorMap[newKey] != null) {
+  const victim = actorMap[newKey];
+  if (victim) {
     //decrement hitpoints of the actor at the destination tile
-    const victim = actorMap[newKey];
     victim.hp--;
 
     // if it's dead remove its reference
     if (victim.hp == 0) {
       actorMap[newKey] = null;
-      actorList[actorList.indexOf(victim)] = null;
+      enemyList.splice(enemyList.indexOf(victim));
       if (victim != player) {
         livingEnemies--;
         if (livingEnemies == 0) {
@@ -177,42 +179,41 @@ function moveTo(actor: Actor, dir: Direction) {
   return true;
 }
 
-function onKeyUp(event) {
+export function onKeyUp(event: KeyboardEvent) {
   // draw map to overwrite previous actors positions
   // drawMap();
 
+  console.log("onKeyUp", event);
+
   // act on player input
   let acted = false;
-  switch (event.keyCode) {
-    case Phaser.Keyboard.LEFT:
+  switch (event.key) {
+    case "ArrowLeft":
       acted = moveTo(player, { x: -1, y: 0 });
       break;
 
-    case Phaser.Keyboard.RIGHT:
+    case "ArrowRight":
       acted = moveTo(player, { x: 1, y: 0 });
       break;
 
-    case Phaser.Keyboard.UP:
+    case "ArrowUp":
       acted = moveTo(player, { x: 0, y: -1 });
       break;
 
-    case Phaser.Keyboard.DOWN:
+    case "ArrowDown":
       acted = moveTo(player, { x: 0, y: 1 });
       break;
   }
 
   // enemies act every time the player does
   if (acted)
-    for (const enemy in actorList) {
-      // skip the player
-      if (enemy == 0) continue;
-
-      const e = actorList[enemy];
+    for (const enemy in enemyList) {
+      const e = enemyList[enemy];
       if (e != null) aiAct(e);
     }
 
   // draw actors in new positions
-  // drawActors();
+  drawActors();
 }
 
 function aiAct(actor: Actor) {
@@ -226,9 +227,14 @@ function aiAct(actor: Actor) {
   const dy = player.y - actor.y;
 
   // if player is far away, walk randomly
-  if (Math.abs(dx) + Math.abs(dy) > 6)
+  if (Math.abs(dx) + Math.abs(dy) > 6) {
     // try to walk in random directions until you succeed once
-    while (!moveTo(actor, directions[randomInt(directions.length)])) {}
+    let moved = false;
+    do {
+      moved = moveTo(actor, directions[randomInt(directions.length)]);
+    } while (!moved);
+  }
+
   // otherwise walk towards player
   if (Math.abs(dx) > Math.abs(dy)) {
     if (dx < 0) {

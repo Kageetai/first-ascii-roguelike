@@ -1,4 +1,7 @@
-export const swipeDetect = (el: HTMLElement) => {
+export const swipeDetect = (
+  el: HTMLElement,
+  callback: (event: DirectionalEvent) => void,
+) => {
   const surface = el;
   let startX = 0;
   let startY = 0;
@@ -18,19 +21,17 @@ export const swipeDetect = (el: HTMLElement) => {
     distX = e.changedTouches[0].pageX - startX;
     distY = e.changedTouches[0].pageY - startY;
 
-    console.log("touchend", e);
-
     if (Math.abs(distX) > Math.abs(distY)) {
       if (distX > 0) {
-        console.log("swipe right");
+        callback({ key: "ArrowRight" });
       } else {
-        console.log("swipe left");
+        callback({ key: "ArrowLeft" });
       }
     } else {
       if (distY > 0) {
-        console.log("swipe down");
+        callback({ key: "ArrowDown" });
       } else {
-        console.log("swipe up");
+        callback({ key: "ArrowUp" });
       }
     }
   });

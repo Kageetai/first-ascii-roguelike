@@ -156,7 +156,7 @@ function moveTo(actor: Actor, dir: Direction) {
   return true;
 }
 
-export function onKeyUp(event: KeyboardEvent) {
+export function onKeyUp(event: DirectionalEvent) {
   // draw map to overwrite previous actors positions
   drawMap();
 

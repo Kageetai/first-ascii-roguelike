@@ -12,3 +12,7 @@ type Direction = {
   x: number;
   y: number;
 };
+
+type DirectionalEvent = {
+  key: "ArrowLeft" | "ArrowRight" | "ArrowUp" | "ArrowDown";
+};

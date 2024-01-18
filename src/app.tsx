@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import "./app.css";
 
@@ -10,11 +10,13 @@ const initialState = create();
 export function App() {
   const [game, setGame] = useState(initialState);
 
-  swipeDetect(document.body);
+  useEffect(() => {
+    swipeDetect(document.body, (e) => setGame(onKeyUp(e)));
+  }, []);
 
   const onKeyUpEvent = (e: KeyboardEvent) => {
     e.preventDefault();
-    const updatedDisplay = onKeyUp(e);
+    const updatedDisplay = onKeyUp(e as DirectionalEvent);
     setGame(updatedDisplay);
   };
 

@@ -3,13 +3,17 @@ import { useState } from "preact/hooks";
 import "./app.css";
 
 import { COLS, create, GameState, onKeyUp, ROWS } from "./game.ts";
+import { swipeDetect } from "./swipeDetect.ts";
 
 const initialState = create();
 
 export function App() {
   const [game, setGame] = useState(initialState);
 
+  swipeDetect(document.body);
+
   const onKeyUpEvent = (e: KeyboardEvent) => {
+    e.preventDefault();
     const updatedDisplay = onKeyUp(e);
     setGame(updatedDisplay);
   };
@@ -29,10 +33,6 @@ export function App() {
       </style>
 
       <h1>First ASCII Roguelike</h1>
-
-      <p>
-        <small>Preact Version</small>
-      </p>
 
       <div class="grid" onKeyUp={onKeyUpEvent} tabIndex={0}>
         {game.map.map((r) => r.map((c) => <div data-cell={c}>{c}</div>))}

@@ -6,7 +6,7 @@
 }
 
 #app {
-  width: min(100vmin, var(--max-width));
+  width: min(100dvmin, var(--max-width));
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -17,7 +17,7 @@
   grid-template: repeat(var(--map-rows), 1fr) / repeat(var(--map-cols), 1fr);
   align-content: space-between;
   justify-content: space-between;
-  font-size: calc((min(100vmin, var(--max-width)) - 4rem) / var(--map-cols));
+  font-size: calc((min(100dvmin, var(--max-width)) - 4rem) / var(--map-cols));
   outline: none;
 
   /* player color */

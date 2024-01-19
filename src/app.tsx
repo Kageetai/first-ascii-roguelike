@@ -43,7 +43,7 @@ export function App() {
       <dialog id="dialog">
         <h1>{game.state === GameState.VICTORY ? "Victory" : "Game Over"}</h1>
 
-        <p>Restart with Ctrl/Cmd+R</p>
+        <p>Refresh the page to restart</p>
       </dialog>
     </>
   );

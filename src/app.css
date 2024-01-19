@@ -1,23 +1,31 @@
 :root {
   --map-rows: 10;
   --map-cols: 10;
-  --max-width: 500px;
   --transition-duration: 0.3s;
+  --app-padding: 2rem;
 }
 
 #app {
-  width: min(100dvmin, var(--max-width));
-  margin: 0 auto;
-  padding: 2rem;
+  padding: var(--app-padding);
   text-align: center;
+  font-size: 3dvmin;
+}
+
+h1 {
+  font-size: 8dvmin;
+  margin-bottom: 2dvmin;
+  margin-top: 0;
 }
 
 .grid {
   display: grid;
-  grid-template: repeat(var(--map-rows), 1fr) / repeat(var(--map-cols), 1fr);
-  align-content: space-between;
-  justify-content: space-between;
-  font-size: calc((min(100dvmin, var(--max-width)) - 4rem) / var(--map-cols));
+  grid-template-columns: repeat(var(--map-rows), 1fr);
+  grid-auto-rows: minmax(1em, auto);
+  /* calculate the font-size based on the number of columns minus padding and space for heading */
+  font-size: calc(
+    (100dvmin - var(--app-padding) * 2 - 12dvmin) / var(--map-cols)
+  );
+  aspect-ratio: 1;
   outline: none;
 
   /* player color */
@@ -48,7 +56,7 @@ dialog {
     display var(--transition-duration) ease-out allow-discrete,
     backdrop-filter var(--transition-duration) allow-discrete;
   /* Equivalent to
-  transition: all var(--transition-duration allow-discrete; */
+    transition: all var(--transition-duration allow-discrete; */
 }
 
 /*   Before-open state  */
@@ -69,7 +77,7 @@ dialog::backdrop {
     background-color var(--transition-duration),
     backdrop-filter var(--transition-duration) allow-discrete;
   /* Equivalent to
-  transition: all var(--transition-duration allow-discrete; */
+    transition: all var(--transition-duration allow-discrete; */
 }
 
 dialog[open]::backdrop {

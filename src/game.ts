@@ -103,9 +103,8 @@ function drawActors() {
   asciiDisplay[player.y][player.x] = player.hp;
 
   // draw the enemies
-  for (const a in enemyList) {
-    if (enemyList[a] != null && enemyList[a].hp > 0)
-      asciiDisplay[enemyList[a].y][enemyList[a].x] = "e";
+  for (const a of enemyList) {
+    if (a != null && a.hp > 0) asciiDisplay[a.y][a.x] = "e";
   }
 }
 
@@ -182,9 +181,8 @@ export function onKeyUp(event: DirectionalEvent) {
 
   // enemies act every time the player does
   if (acted)
-    for (const enemy in enemyList) {
-      const e = enemyList[enemy];
-      if (e != null) aiAct(e);
+    for (const enemy of enemyList) {
+      if (enemy != null) aiAct(enemy);
     }
 
   // draw actors in new positions
